@@ -31,25 +31,25 @@ namespace Clientes.Infra.Repositorios
         {
             var fopRequest = FopExpressionBuilder<Cliente>.Build(filter, order, pageNumber, pageSize);
 
-            var (filteredClientes, totalRecords) = _dataContext.Clientes
+            var query = _dataContext.Clientes
                 .Include(c => c.Endereco)
                 .Include(c => c.Documento)
                 .Include(c => c.Email)
                 .Include(c => c.Telefone)
-                .Where(x => !x.Removido)
+                .Where(x => !x.Removido);
+
+            var (filteredClientes, totalRecords) = query
                 .AsNoTracking()
                 .ApplyFop(fopRequest);
 
             var clientesLista = await filteredClientes.ToListAsync();
 
-            var clientesListaDto = new List<ClienteDto>();
-
-            clientesListaDto = clientesLista?.Select(c => new ClienteDto
+            var clientesListaDto = clientesLista.Select(c => new ClienteDto
             {
                 Id = c.Id,
                 Nome = c.Nome,
                 Documento = c.Documento.Numero,
-                TipoDocumento = c.Documento.Tipo,
+                TipoDocumento = (Dominio.ObjetosDeValor.TipoDocumento)(int)c.Documento.Tipo,
                 DataNascimento = c.DataNascimento,
                 Telefone = c.Telefone.Numero,
                 Email = c.Email.Endereco,
@@ -68,42 +68,53 @@ namespace Clientes.Infra.Repositorios
 
         public async Task<Cliente[]> GetClientesByNomeAsync(string nome)
         {
-            IQueryable<Cliente> query = _dataContext.Clientes
-                .Include(c => c.Endereco);
-
-            query = query.AsNoTracking().OrderBy(c => c.Nome)
-                        .Where(c => c.Nome.ToLower().Contains(nome.ToLower()) && !c.Removido);
+            var query = _dataContext.Clientes
+                .Include(c => c.Endereco)
+                .Include(c => c.Documento)
+                .Include(c => c.Email)
+                .Include(c => c.Telefone)
+                .Where(c => c.Nome.ToLower().Contains(nome.ToLower()) && !c.Removido)
+                .AsNoTracking()
+                .OrderBy(c => c.Nome);
 
             return await query.ToArrayAsync();
         }
 
         public async Task<Cliente> GetClienteByIdAsync(Guid clienteId)
         {
-            IQueryable<Cliente> query = _dataContext.Clientes
-                .Include(c => c.Endereco);
-
-            query = query.AsNoTracking()
-                        .Where(c => c.Id == clienteId && !c.Removido);
+            var query = _dataContext.Clientes
+                .Include(c => c.Endereco)
+                .Include(c => c.Documento)
+                .Include(c => c.Email)
+                .Include(c => c.Telefone)
+                .Where(c => c.Id == clienteId && !c.Removido)
+                .AsNoTracking();
 
             return await query.FirstOrDefaultAsync();
         }
 
         public async Task<Cliente> GetClienteByDocumentoAsync(string documento)
         {
-            IQueryable<Cliente> query = _dataContext.Clientes;
-
-            query = query.AsNoTracking()
-                        .Where(c => c.Documento.Numero == documento && !c.Removido);
+            var query = _dataContext.Clientes
+                .Include(c => c.Endereco)
+                .Include(c => c.Documento)
+                .Include(c => c.Email)
+                .Include(c => c.Telefone)
+                .Where(c => c.Documento.Numero == documento && !c.Removido)
+                .AsNoTracking();
 
             return await query.FirstOrDefaultAsync();
         }
 
         public async Task<Cliente> GetClienteByEmailAsync(string email)
         {
-            IQueryable<Cliente> query = _dataContext.Clientes;
-
-            query = query.AsNoTracking()
-                        .Where(c => c.Email.Endereco == email && !c.Removido);
+            var query = _dataContext.Clientes
+                .Include(c => c.Endereco)
+                .Include(c => c.Documento)
+                .Include(c => c.Email)
+                .Include(c => c.Telefone)
+                .Where(c => c.Email.Endereco == email && !c.Removido)
+                .AsNoTracking();
 
             return await query.FirstOrDefaultAsync();
         }

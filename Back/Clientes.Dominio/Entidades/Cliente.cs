@@ -6,8 +6,14 @@ namespace Clientes.Dominio.Entidades
     {
         public Guid Id { get; private set; }
         public string Nome { get; private set; }
-        public Documento Documento { get; private set; }
+
+        public Guid DocumentoId { get; private set; }
+        public Guid EmailId { get; private set; }
+        public Guid EnderecoId { get; private set; }
+        public Guid TelefoneId { get; private set; }
+
         public DateTime DataNascimento { get; private set; }
+        public Documento Documento { get; private set; }
         public Telefone Telefone { get; private set; }
         public Email Email { get; private set; }
         public Endereco Endereco { get; private set; }
@@ -34,6 +40,12 @@ namespace Clientes.Dominio.Entidades
             Endereco = endereco;
             InscricaoEstadual = inscricaoEstadual;
             Isento = isento;
+            
+            // Definir as chaves estrangeiras
+            DocumentoId = documento.Id;
+            EmailId = email.Id;
+            EnderecoId = endereco.Id;
+            TelefoneId = telefone.Id;
         }
 
         public void AtualizarDados(
@@ -53,9 +65,14 @@ namespace Clientes.Dominio.Entidades
             Endereco = endereco;
             InscricaoEstadual = inscricaoEstadual;
             Isento = isento;
+            
+            // Atualizar as chaves estrangeiras
+            DocumentoId = documento.Id;
+            EmailId = email.Id;
+            EnderecoId = endereco.Id;
+            TelefoneId = telefone.Id;
         }
 
         public void Remover() => Removido = true;
-
     }
 }
