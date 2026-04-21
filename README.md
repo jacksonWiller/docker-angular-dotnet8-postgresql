@@ -9,21 +9,37 @@ Vou atualizar o README.md com uma documentação mais completa e organizada:
 Aqui está o conteúdo completo do README.md com toda a documentação atualizada:
 
 ```markdown
-# Sistema de Cadastro de Clientes - Teste Dev Rommanel
+# 📋 Sistema de Cadastro de Clientes - Teste Dev Rommanel
 
-Este projeto consiste em um sistema CRUD para cadastro de clientes, desenvolvido utilizando Angular no front-end e .NET 8 no back-end, seguindo os princípios de Domain-Driven Design (DDD) e o padrão CQRS.
+> Um sistema CRUD completo para gerenciamento de clientes (pessoas físicas e jurídicas) desenvolvido com **.NET 8**, **Angular 17+**, **PostgreSQL** e **Docker**, seguindo os princípios de **DDD** e **CQRS**.
+
+## 🚀 Funcionalidades Principais
+
+- ✅ Cadastro de pessoas físicas (CPF) e jurídicas (CNPJ)
+- ✅ Validação de CPF/CNPJ com dígitos verificadores
+- ✅ Validação de e-mail único no sistema
+- ✅ Consulta com paginação, filtro e ordenação
+- ✅ Atualização e exclusão (soft delete) de clientes
+- ✅ Interface moderna em Angular com PrimeNG
+- ✅ Documentação API com Swagger
+- ✅ Containerizado com Docker Compose
 
 ## 📋 Índice
 
-- [Visão Geral](#visão-geral)
-- [Arquitetura](#arquitetura)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Pré-requisitos](#pré-requisitos)
-- [Como Executar](#como-executar)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [Regras de Negócio](#regras-de-negócio)
-- [API Endpoints](#api-endpoints)
-- [Screenshots](#screenshots)
+1. [Visão Geral](#visão-geral)
+2. [Arquitetura](#arquitetura)
+3. [Tecnologias Utilizadas](#tecnologias-utilizadas)
+4. [Pré-requisitos](#pré-requisitos)
+5. [Como Executar](#como-executar)
+6. [Estrutura do Projeto](#estrutura-do-projeto)
+7. [Regras de Negócio](#regras-de-negócio)
+8. [API Endpoints](#api-endpoints)
+9. [Screenshots](#screenshots)
+10. [Comandos Docker](#comandos-docker-úteis)
+11. [Banco de Dados](#banco-de-dados)
+12. [Contribuição](#contribuição)
+13. [Licença](#licença)
+14. [Desenvolvedor](#desenvolvedor)
 
 ---
 
@@ -46,64 +62,94 @@ O sistema permite o cadastro, consulta, atualização e exclusão de clientes (p
 
 ### Domain-Driven Design (DDD)
 
-O projeto utiliza DDD para organizar o código em camadas bem definidas:
+O projeto utiliza DDD para organizar o código em camadas bem definidas, garantindo separação de responsabilidades e manutenibilidade:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      Presentation Layer                      │
-│                    (Clientes.Api + Angular)                  │
-└─────────────────────────────────────────────────────────────┘
-                              ↕
-┌─────────────────────────────────────────────────────────────┐
-│                     Application Layer                        │
-│              (Commands, Queries, MediatR)                   │
-└─────────────────────────────────────────────────────────────┘
-                              ↕
-┌─────────────────────────────────────────────────────────────┐
-│                       Domain Layer                           │
-│         (Entidades, Value Objects, Domain Events)           │
-└─────────────────────────────────────────────────────────────┘
-                              ↕
-┌─────────────────────────────────────────────────────────────┐
-│                   Infrastructure Layer                       │
-│        (EF Core, Repositories, Database, External APIs)     │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                    PRESENTATION LAYER                            │
+│  ┌──────────────────────────────┐     ┌──────────────────────┐  │
+│  │   Angular Frontend           │     │   .NET 8 API         │  │
+│  │   (Porta 4200)               │────▶│   (Porta 8090)       │  │
+│  │   - PrimeNG Components       │     │   - Swagger Docs     │  │
+│  │   - Reactive Forms           │     │   - CORS Config      │  │
+│  └──────────────────────────────┘     └──────────────────────┘  │
+└──────────────────────────────────────────────────────────────────┘
+                              │ HTTP/REST
+                              ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                    APPLICATION LAYER                             │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │                    MediatR (CQRS)                          │ │
+│  │  ┌──────────────┐              ┌──────────────┐            │ │
+│  │  │   COMMANDS   │              │    QUERIES   │            │ │
+│  │  │  (Write Ops) │              │  (Read Ops)  │            │ │
+│  │  └──────────────┘              └──────────────┘            │ │
+│  └────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                       DOMAIN LAYER                               │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │  Entidades: Cliente, Documento, Email, Endereco, Telefone  │ │
+│  │  Value Objects: Documento, Email, Telefone                 │ │
+│  │  Domain Events, Dtos, Interfaces                           │ │
+│  └────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                  INFRASTRUCTURE LAYER                            │
+│  ┌──────────────────────────────┐     ┌──────────────────────┐  │
+│  │   Entity Framework Core      │     │   PostgreSQL 12      │  │
+│  │   - Migrations               │     │   (Porta 5434)       │  │
+│  │   - Repositories             │     │   - Data Volume      │  │
+│  │   - DbContext                │     │   - Indexes          │  │
+│  └──────────────────────────────┘     └──────────────────────┘  │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ### CQRS (Command Query Responsibility Segregation)
 
-Separação clara entre operações de escrita (Commands) e leitura (Queries):
+Padrão implementado com MediatR para separar operações de leitura e escrita:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        Commands                              │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐ │
-│  │ CreateCliente   │  │ UpdateCliente   │  │ DeleteCliente│ │
-│  └────────┬────────┘  └────────┬────────┘  └──────┬──────┘ │
-│           ↓                    ↓                   ↓         │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │         Command Handlers (Aplicacao)                 │   │
-│  └──────────────────────────┬───────────────────────────┘   │
-│                             ↓                                │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │         Domain Entities + Repositories               │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│                         Queries                              │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐ │
-│  │ GetAllClientes  │  │ GetClienteById  │  │ SearchClient │ │
-│  └────────┬────────┘  └────────┬────────┘  └──────┬──────┘ │
-│           ↓                    ↓                   ↓         │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │         Query Handlers (Aplicacao)                   │   │
-│  └──────────────────────────┬───────────────────────────┘   │
-│                             ↓                                │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │         Database (Read Operations)                   │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+WRITE OPERATIONS (Commands)                    READ OPERATIONS (Queries)
+┌─────────────────────────┐                    ┌─────────────────────────┐
+│  CreateClienteCommand   │                    │  GetAllClientesQuery    │
+│  UpdateClienteCommand   │                    │  GetClienteByIdQuery    │
+│  DeleteClienteCommand   │                    │  SearchClientesQuery    │
+└───────────┬─────────────┘                    └───────────┬─────────────┘
+            │                                              │
+            ▼                                              ▼
+┌─────────────────────────┐                    ┌─────────────────────────┐
+│  Command Handlers       │                    │  Query Handlers         │
+│  - Validação            │                    │  - Filtragem            │
+│  - Regras de Negócio    │                    │  - Paginação            │
+│  - Domain Validation    │                    │  - Ordenação            │
+└───────────┬─────────────┘                    └───────────┬─────────────┘
+            │                                              │
+            ▼                                              ▼
+┌─────────────────────────┐                    ┌─────────────────────────┐
+│  Domain Entities        │                    │  DTOs                   │
+│  - Cliente              │                    │  - ClienteDto           │
+│  - Validação            │                    │  - Paginação            │
+└───────────┬─────────────┘                    └───────────┬─────────────┘
+            │                                              │
+            ▼                                              │
+┌─────────────────────────┐                                │
+│  Repositories           │                                │
+│  - IClienteRepository   │                                │
+│  - Save Changes         │                                │
+└───────────┬─────────────┘                                │
+            │                                              │
+            └──────────────────┬───────────────────────────┘
+                               ▼
+                    ┌─────────────────────────┐
+                    │   PostgreSQL Database   │
+                    │   - Write Operations    │
+                    │   - Read Operations     │
+                    └─────────────────────────┘
 ```
 
 ---
@@ -151,56 +197,84 @@ Separação clara entre operações de escrita (Commands) e leitura (Queries):
 
 ## 🚀 Como Executar
 
-### 1. Clone o repositório
+### Pré-requisitos
+
+Antes de começar, certifique-se de ter instalado:
+
+- ✅ **Docker** (versão 20.10 ou superior)
+- ✅ **Docker Compose** (versão 2.0 ou superior)
+- ✅ **Git** (para clonar o repositório)
+
+### Passo a Passo
+
+#### 1️⃣ Clone o repositório
 
 ```bash
 git clone https://github.com/jacksonWiller/docker-angular-dotnet8-postgresql.git
 cd TesteDevRommanel
 ```
 
-### 2. Execute os containers
+#### 2️⃣ Inicie os containers
 
 ```bash
-# Iniciar todos os serviços em background
+# Opção 1: Iniciar em background (recomendado)
 docker-compose up -d
+
+# Opção 2: Reconstruir as imagens antes de iniciar
+docker-compose up --build -d
 ```
 
-### 3. Verifique o status dos containers
+#### 3️⃣ Verifique o status
 
 ```bash
-# Verificar se todos os containers estão rodando
+# Verificar se todos os serviços estão rodando
 docker-compose ps
 
-# Ver logs do serviço db-init (inicialização do banco)
-docker-compose logs db-init
-
-# Ver logs da API
-docker-compose logs -f api
-
-# Ver logs do frontend
-docker-compose logs -f frontend
+# Esperar alguns segundos para inicialização completa
+sleep 10
 ```
 
-### 4. Acesse a aplicação
+#### 4️⃣ Acesse a aplicação
 
 | Serviço | URL | Porta | Descrição |
 |---------|-----|-------|-----------|
-| **Front-end** | http://localhost:4200 | 4200 | Aplicação Angular |
-| **API** | http://localhost:8090 | 8090 | API REST .NET 8 |
-| **Swagger** | http://localhost:8090/swagger | 8090 | Documentação da API |
-| **PostgreSQL** | localhost:5434 | 5434 | Banco de dados |
+| 🎨 **Front-end** | http://localhost:4200 | 4200 | Aplicação Angular |
+| 🔌 **API** | http://localhost:8090 | 8090 | API REST .NET 8 |
+| 📚 **Swagger** | http://localhost:8090/swagger | 8090 | Documentação interativa |
+| 🗄️ **PostgreSQL** | localhost:5434 | 5434 | Banco de dados |
 
-### 5. Teste a API
+#### 5️⃣ Teste a API
 
 ```bash
-# Testar endpoint de listagem de clientes
+# Listar todos os clientes
 curl http://localhost:8090/api/clientes
 
-# Testar com paginação
+# Com paginação
 curl "http://localhost:8090/api/clientes?pageNumber=1&pageSize=10"
 
-# Testar com filtro
+# Com filtro por nome
 curl "http://localhost:8090/api/clientes?filter=maria"
+
+# Com ordenação
+curl "http://localhost:8090/api/clientes?order=nome"
+```
+
+### 🐛 Troubleshooting
+
+Se encontrar problemas:
+
+```bash
+# Ver logs de inicialização
+docker-compose logs db-init
+
+# Ver logs da API em tempo real
+docker-compose logs -f api
+
+# Reiniciar todos os serviços
+docker-compose restart
+
+# Limpeza completa (remove dados!)
+docker-compose down -v
 ```
 
 ---
@@ -443,17 +517,17 @@ GET /api/clientes?pageNumber=1&pageSize=10&filter=maria&order=nome
 
 ## 📸 Screenshots
 
-### Back-end
+### Back-end - Swagger UI
 
-![Back-end Architecture](https://github.com/jacksonWiller/docker-angular-dotnet8-postgresql/blob/main/doc/back-end.png)
+![Swagger UI - Documentação da API](https://github.com/jacksonWiller/docker-angular-dotnet8-postgresql/blob/main/doc/back-end.png)
 
-**Figura 1:** Arquitetura do back-end com as camadas DDD e CQRS
+**Figura 1:** Documentação interativa da API REST com Swagger UI, mostrando os endpoints disponíveis para gerenciamento de clientes.
 
-### Front-end
+### Front-end - Tela de CRUD
 
-![Front-end Interface](https://github.com/jacksonWiller/docker-angular-dotnet8-postgresql/blob/main/doc/front-end.png)
+![Tela de CRUD - Lista de Clientes](https://github.com/jacksonWiller/docker-angular-dotnet8-postgresql/blob/main/doc/front-end.png)
 
-**Figura 2:** Interface do front-end em Angular com PrimeNG
+**Figura 2:** Interface do sistema de cadastro de clientes em Angular com PrimeNG, exibindo a lista de clientes com opções de criar, editar e excluir.
 
 ---
 
