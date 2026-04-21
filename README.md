@@ -1,6 +1,3 @@
-
-
-```markdown
 # 📋 Sistema de Cadastro de Clientes - Teste Dev Rommanel
 
 > Um sistema CRUD completo para gerenciamento de clientes (pessoas físicas e jurídicas) desenvolvido com **.NET 8**, **Angular 17+**, **PostgreSQL** e **Docker**, seguindo os princípios de **DDD** e **CQRS**.
@@ -56,109 +53,6 @@ O sistema permite o cadastro, consulta, atualização e exclusão de clientes (p
 
 ---
 
-## 🏗️ Arquitetura
-
-### Domain-Driven Design (DDD)
-
-O projeto utiliza DDD para organizar o código em camadas bem definidas, garantindo separação de responsabilidades e manutenibilidade.
-
-#### Diagrama de Camadas DDD
-
-```mermaid
-graph TB
-    subgraph Presentation["PRESENTATION LAYER"]
-        A[Angular Frontend<br/>Porta 4200]
-        B[.NET 8 API<br/>Porta 8090]
-    end
-    
-    subgraph Application["APPLICATION LAYER"]
-        C[MediatR CQRS]
-        D[Commands Write Ops]
-        E[Queries Read Ops]
-    end
-    
-    subgraph Domain["DOMAIN LAYER"]
-        F[Entidades<br/>Cliente Documento Email Endereco Telefone]
-        G[Value Objects<br/>Documento Email Telefone]
-        H[Domain Events Dtos Interfaces]
-    end
-    
-    subgraph Infrastructure["INFRASTRUCTURE LAYER"]
-        I[Entity Framework Core<br/>Migrations Repositories DbContext]
-        J[PostgreSQL 12<br/>Porta 5434<br/>Data Volume Indexes]
-    end
-    
-    A -->|HTTP/REST| B
-    B --> C
-    C --> D
-    C --> E
-    D --> F
-    E --> G
-    F --> I
-    G --> I
-    I --> J
-    
-    style Presentation fill:#e1f5ff
-    style Application fill:#fff3e0
-    style Domain fill:#f3e5f5
-    style Infrastructure fill:#e8f5e9
-```
-
-#### Fluxo CQRS
-
-```mermaid
-flowchart LR
-    subgraph Commands["WRITE OPERATIONS"]
-        direction TB
-        C1[CreateClienteCommand]
-        C2[UpdateClienteCommand]
-        C3[DeleteClienteCommand]
-    end
-    
-    subgraph Queries["READ OPERATIONS"]
-        direction TB
-        Q1[GetAllClientesQuery]
-        Q2[GetClienteByIdQuery]
-        Q3[SearchClientesQuery]
-    end
-    
-    subgraph Handlers["HANDLERS"]
-        direction TB
-        H1[Command Handlers<br/>Validação<br/>Regras de Negócio]
-        H2[Query Handlers<br/>Filtragem<br/>Paginação<br/>Ordenação]
-    end
-    
-    subgraph Domain["DOMAIN LAYER"]
-        D1[Domain Entities<br/>Cliente Validação]
-        D2[DTOs<br/>ClienteDto Paginação]
-    end
-    
-    subgraph Repository["REPOSITORY LAYER"]
-        R1[IClienteRepository<br/>Save Changes]
-    end
-    
-    subgraph Database["DATABASE"]
-        DB[PostgreSQL<br/>Write & Read Operations]
-    end
-    
-    C1 & C2 & C3 --> H1
-    Q1 & Q2 & Q3 --> H2
-    H1 --> D1
-    H2 --> D2
-    D1 --> R1
-    D2 -.-> DB
-    R1 --> DB
-    
-    style Commands fill:#ffebee
-    style Queries fill:#e8f5e9
-    style Handlers fill:#fff3e0
-    style Domain fill:#f3e5f5
-    style Repository fill:#e1f5ff
-    style Database fill:#fce4ec
-```
-
----
-
 ## 🛠️ Tecnologias Utilizadas
 
 ### Back-end
@@ -201,14 +95,6 @@ flowchart LR
 ---
 
 ## 🚀 Como Executar
-
-### Pré-requisitos
-
-Antes de começar, certifique-se de ter instalado:
-
-- ✅ **Docker** (versão 20.10 ou superior)
-- ✅ **Docker Compose** (versão 2.0 ou superior)
-- ✅ **Git** (para clonar o repositório)
 
 ### Passo a Passo
 
@@ -493,7 +379,7 @@ graph TB
 | 🎂 **Idade** | Pessoa física ≥ 18 anos | Cálculo baseado em DataNascimento |
 | ⚖️ **IE/Isento** | PJ precisa de um dos dois | Validação cruzada |
 
-### 6️⃣ Fluxo de Validação
+### Fluxo de Validação
 
 ```mermaid
 flowchart TD
@@ -597,25 +483,7 @@ curl http://localhost:8090/api/clientes
 }
 ```
 
-#### 2️⃣ Listar com Paginação
-
-```bash
-curl "http://localhost:8090/api/clientes?pageNumber=2&pageSize=5"
-```
-
-#### 3️⃣ Buscar com Filtro
-
-```bash
-curl "http://localhost:8090/api/clientes?filter=maria"
-```
-
-#### 4️⃣ Buscar com Ordenação
-
-```bash
-curl "http://localhost:8090/api/clientes?order=nome&orderDirection=desc"
-```
-
-#### 5️⃣ Criar Cliente (Pessoa Física)
+#### 2️⃣ Criar Cliente (Pessoa Física)
 
 ```bash
 curl -X POST http://localhost:8090/api/clientes \
@@ -650,7 +518,7 @@ curl -X POST http://localhost:8090/api/clientes \
 }
 ```
 
-#### 6️⃣ Criar Cliente (Erro de Validação)
+#### 3️⃣ Criar Cliente (Erro de Validação)
 
 **Resposta de Erro:**
 ```json
@@ -666,44 +534,6 @@ curl -X POST http://localhost:8090/api/clientes \
       "errorMessage": "E-mail já cadastrado!"
     }
   ]
-}
-```
-
-#### 7️⃣ Atualizar Cliente
-
-```bash
-curl -X PUT http://localhost:8090/api/clientes/c1d2e3f4-a5b6-7890-c1d2-e3f4a5b67890 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "Maria Silva Souza",
-    "documento": "123.456.789-00",
-    "dataNascimento": "1985-06-15",
-    "telefone": "(11) 98765-4321",
-    "email": "maria.souza@email.com",
-    "inscricaoEstadual": "",
-    "isento": true,
-    "endereco": {
-      "cep": "01001-000",
-      "logradouro": "Praça da Sé",
-      "numero": "456",
-      "bairro": "Sé",
-      "cidade": "São Paulo",
-      "estado": "SP"
-    }
-  }'
-```
-
-#### 8️⃣ Excluir Cliente (Soft Delete)
-
-```bash
-curl -X DELETE http://localhost:8090/api/clientes/c1d2e3f4-a5b6-7890-c1d2-e3f4a5b67890
-```
-
-**Resposta:**
-```json
-{
-  "success": true,
-  "message": "Cliente removido com sucesso!"
 }
 ```
 
@@ -817,57 +647,53 @@ docker volume ls
 
 ## 🗄️ Banco de Dados
 
-### Estrutura do Banco
+### Diagrama Entidade-Relacionamento
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Clientes                              │
-├─────────────────────────────────────────────────────────────┤
-│ Id (PK)          │ UUID                                      │
-│ Nome             │ VARCHAR                                   │
-│ DocumentoId (FK) │ UUID → Documento.Id                       │
-│ DataNascimento   │ TIMESTAMP                                 │
-│ TelefoneId (FK)  │ UUID → Telefone.Id                        │
-│ EmailId (FK)     │ UUID → Email.Id                           │
-│ EnderecoId (FK)  │ UUID → Endereco.Id                        │
-│ InscricaoEstadual│ VARCHAR                                   │
-│ Isento           │ BOOLEAN                                   │
-│ Removido         │ BOOLEAN (Soft Delete)                     │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│                        Documento                             │
-├─────────────────────────────────────────────────────────────┤
-│ Id      (PK) │ UUID                                        │
-│ Numero       │ VARCHAR (CPF/CNPJ)                          │
-│ Tipo         │ INTEGER (1=CPF, 2=CNPJ)                     │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│                          Email                               │
-├─────────────────────────────────────────────────────────────┤
-│ Id       (PK) │ UUID                                        │
-│ Endereco      │ VARCHAR (e-mail)                            │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│                        Endereco                              │
-├─────────────────────────────────────────────────────────────┤
-│ Id         (PK) │ UUID                                      │
-│ Cep           │ VARCHAR                                     │
-│ Logradouro    │ VARCHAR                                     │
-│ Numero        │ VARCHAR                                     │
-│ Bairro        │ VARCHAR                                     │
-│ Cidade        │ VARCHAR                                     │
-│ Estado        │ VARCHAR (2 caracteres)                      │
-└─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│                        Telefone                              │
-├─────────────────────────────────────────────────────────────┤
-│ Id       (PK) │ UUID                                        │
-│ Numero        │ VARCHAR (formato (XX) XXXXX-XXXX)           │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+erDiagram
+    CLIENTES ||--o{ DOCUMENTO : tem
+    CLIENTES ||--o{ EMAIL : tem
+    CLIENTES ||--o{ ENDERECO : tem
+    CLIENTES ||--o{ TELEFONE : tem
+    
+    CLIENTES {
+        uuid Id PK
+        string Nome
+        uuid DocumentoId FK
+        timestamp DataNascimento
+        uuid TelefoneId FK
+        uuid EmailId FK
+        uuid EnderecoId FK
+        string InscricaoEstadual
+        boolean Isento
+        boolean Removido
+    }
+    
+    DOCUMENTO {
+        uuid Id PK
+        string Numero
+        integer Tipo
+    }
+    
+    EMAIL {
+        uuid Id PK
+        string Endereco
+    }
+    
+    ENDERECO {
+        uuid Id PK
+        string Cep
+        string Logradouro
+        string Numero
+        string Bairro
+        string Cidade
+        string Estado
+    }
+    
+    TELEFONE {
+        uuid Id PK
+        string Numero
+    }
 ```
 
 ### Dados Iniciais
@@ -889,6 +715,25 @@ O sistema vem com dados de exemplo para testes:
 - ✅ CORS configurado para desenvolvimento
 - ✅ HTTPS configurado para produção
 
+### Diagrama de Fluxo de Segurança
+
+```mermaid
+flowchart TD
+    A[Requisição HTTP] --> B{Validação de Entrada}
+    B -->|Inválida| C[❌ Retornar 400]
+    B -->|Válida| D{Sanitização}
+    D --> E[Proteção SQL Injection]
+    E --> F{CORS Check}
+    F -->|Bloqueado| G[❌ Retornar 403]
+    F -->|Permitido| H[Processar Requisição]
+    H --> I[Resposta Segura]
+    
+    style A fill:#e3f2fd
+    style C fill:#ffcdd2
+    style G fill:#ffcdd2
+    style I fill:#c8e6c9
+```
+
 ---
 
 ## 📈 Performance
@@ -898,6 +743,30 @@ O sistema vem com dados de exemplo para testes:
 - ✅ Indexação nas chaves estrangeiras
 - ✅ Connection pooling do Npgsql
 - ✅ Lazy loading desativado para controle explícito
+
+### Diagrama de Otimização
+
+```mermaid
+graph TB
+    subgraph Otimizacoes["Otimizações de Performance"]
+        O1[Paginação<br/>Skip/Take]
+        O2[AsNoTracking<br/>Leitura]
+        O3[Indexação<br/>FK Columns]
+        O4[Connection Pooling<br/>Npgsql]
+        O5[Eager Loading<br/>Include]
+    end
+    
+    O1 --> Q[Query Optimization]
+    O2 --> Q
+    O3 --> Q
+    O4 --> Q
+    O5 --> Q
+    
+    Q --> DB[(PostgreSQL)]
+    
+    style Otimizacoes fill:#e8f5e9
+    style DB fill:#f3e5f5
+```
 
 ---
 
@@ -923,3 +792,80 @@ cd Front/cliente-app
 ng test
 ```
 
+### Estrutura de Testes
+
+```mermaid
+graph LR
+    subgraph BackendTests["Back-end Tests"]
+        B1[Testes Unitários<br/>xUnit]
+        B2[Testes de Integração<br/>EF Core]
+    end
+    
+    subgraph FrontendTests["Front-end Tests"]
+        F1[Testes Unitários<br/>Jasmine/Karma]
+        F2[Testes E2E<br/>Protractor/Cypress]
+    end
+    
+    BackendTests --> T[Testes]
+    FrontendTests --> T
+    
+    style BackendTests fill:#e1f5ff
+    style FrontendTests fill:#fff3e0
+```
+
+---
+
+## 🤝 Contribuição
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/minha-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/minha-feature`)
+5. Abra um Pull Request
+
+### Fluxo de Contribuição
+
+```mermaid
+flowchart TD
+    A[Fork do Projeto] --> B[Criar Branch]
+    B --> C[Fazer Mudanças]
+    C --> D{Testes Passaram?}
+    D -->|Não| C
+    D -->|Sim| E[Commit]
+    E --> F[Push]
+    F --> G[Pull Request]
+    G --> H{Review}
+    H -->|Aprovado| I[Merge]
+    H -->|Rejeitado| C
+    
+    style A fill:#e3f2fd
+    style I fill:#c8e6c9
+```
+
+---
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+## 👨‍💻 Desenvolvedor
+
+**Jackson Willer**
+
+- GitHub: [@jacksonWiller](https://github.com/jacksonWiller)
+- Email: jackson.willer@example.com
+
+---
+
+## 🙏 Agradecimentos
+
+- .NET Team pela excelente plataforma
+- Angular Team pelo framework moderno
+- PostgreSQL Community pelo banco de dados robusto
+- PrimeNG pela biblioteca de componentes
+
+---
+
+**Desenvolvido com ❤️ usando .NET 8, Angular e Docker**
