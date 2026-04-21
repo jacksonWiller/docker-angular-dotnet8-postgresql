@@ -843,29 +843,3 @@ flowchart TD
 ```
 
 ---
-
-## 📝 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
-
-## 👨‍💻 Desenvolvedor
-
-**Jackson Willer**
-
-- GitHub: [@jacksonWiller](https://github.com/jacksonWiller)
-- Email: jackson.willer@example.com
-
----
-
-## 🙏 Agradecimentos
-
-- .NET Team pela excelente plataforma
-- Angular Team pelo framework moderno
-- PostgreSQL Community pelo banco de dados robusto
-- PrimeNG pela biblioteca de componentes
-
----
-
-**Desenvolvido com ❤️ usando .NET 8, Angular e Docker**
