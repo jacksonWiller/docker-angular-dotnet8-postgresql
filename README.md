@@ -1,12 +1,4 @@
-Vou atualizar o README.md com uma documentação mais completa e organizada:
 
- Entendi! Infelizmente não tenho acesso a ferramentas de edição de arquivos neste ambiente. Vou fornecer o conteúdo completo do README.md atualizado para você copiar e colar:
-
----
-
-## 📄 README.md Atualizado
-
-Aqui está o conteúdo completo do README.md com toda a documentação atualizada:
 
 ```markdown
 # 📋 Sistema de Cadastro de Clientes - Teste Dev Rommanel
@@ -26,20 +18,26 @@ Aqui está o conteúdo completo do README.md com toda a documentação atualizad
 
 ## 📋 Índice
 
-1. [Visão Geral](#visão-geral)
-2. [Arquitetura](#arquitetura)
-3. [Tecnologias Utilizadas](#tecnologias-utilizadas)
-4. [Pré-requisitos](#pré-requisitos)
-5. [Como Executar](#como-executar)
-6. [Estrutura do Projeto](#estrutura-do-projeto)
-7. [Regras de Negócio](#regras-de-negócio)
-8. [API Endpoints](#api-endpoints)
-9. [Screenshots](#screenshots)
-10. [Comandos Docker](#comandos-docker-úteis)
-11. [Banco de Dados](#banco-de-dados)
-12. [Contribuição](#contribuição)
-13. [Licença](#licença)
-14. [Desenvolvedor](#desenvolvedor)
+- [Visão Geral](#visão-geral)
+- [Arquitetura](#arquitetura)
+  - [Diagrama de Camadas DDD](#diagrama-de-camadas-ddd)
+  - [Fluxo CQRS](#fluxo-cqrs)
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [Pré-requisitos](#pré-requisitos)
+- [Como Executar](#como-executar)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Regras de Negócio](#regras-de-negócio)
+  - [Fluxo de Validação](#fluxo-de-validação)
+- [API Endpoints](#api-endpoints)
+- [Screenshots](#screenshots)
+- [Comandos Docker Úteis](#comandos-docker-úteis)
+- [Banco de Dados](#banco-de-dados)
+- [Segurança](#segurança)
+- [Performance](#performance)
+- [Testes](#testes)
+- [Contribuição](#contribuição)
+- [Licença](#licença)
+- [Desenvolvedor](#desenvolvedor)
 
 ---
 
@@ -62,94 +60,101 @@ O sistema permite o cadastro, consulta, atualização e exclusão de clientes (p
 
 ### Domain-Driven Design (DDD)
 
-O projeto utiliza DDD para organizar o código em camadas bem definidas, garantindo separação de responsabilidades e manutenibilidade:
+O projeto utiliza DDD para organizar o código em camadas bem definidas, garantindo separação de responsabilidades e manutenibilidade.
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                    PRESENTATION LAYER                            │
-│  ┌──────────────────────────────┐     ┌──────────────────────┐  │
-│  │   Angular Frontend           │     │   .NET 8 API         │  │
-│  │   (Porta 4200)               │────▶│   (Porta 8090)       │  │
-│  │   - PrimeNG Components       │     │   - Swagger Docs     │  │
-│  │   - Reactive Forms           │     │   - CORS Config      │  │
-│  └──────────────────────────────┘     └──────────────────────┘  │
-└──────────────────────────────────────────────────────────────────┘
-                              │ HTTP/REST
-                              ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                    APPLICATION LAYER                             │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │                    MediatR (CQRS)                          │ │
-│  │  ┌──────────────┐              ┌──────────────┐            │ │
-│  │  │   COMMANDS   │              │    QUERIES   │            │ │
-│  │  │  (Write Ops) │              │  (Read Ops)  │            │ │
-│  │  └──────────────┘              └──────────────┘            │ │
-│  └────────────────────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                       DOMAIN LAYER                               │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │  Entidades: Cliente, Documento, Email, Endereco, Telefone  │ │
-│  │  Value Objects: Documento, Email, Telefone                 │ │
-│  │  Domain Events, Dtos, Interfaces                           │ │
-│  └────────────────────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                  INFRASTRUCTURE LAYER                            │
-│  ┌──────────────────────────────┐     ┌──────────────────────┐  │
-│  │   Entity Framework Core      │     │   PostgreSQL 12      │  │
-│  │   - Migrations               │     │   (Porta 5434)       │  │
-│  │   - Repositories             │     │   - Data Volume      │  │
-│  │   - DbContext                │     │   - Indexes          │  │
-│  └──────────────────────────────┘     └──────────────────────┘  │
-└──────────────────────────────────────────────────────────────────┘
+#### Diagrama de Camadas DDD
+
+```mermaid
+graph TB
+    subgraph Presentation["PRESENTATION LAYER"]
+        A[Angular Frontend<br/>Porta 4200]
+        B[.NET 8 API<br/>Porta 8090]
+    end
+    
+    subgraph Application["APPLICATION LAYER"]
+        C[MediatR CQRS]
+        D[Commands Write Ops]
+        E[Queries Read Ops]
+    end
+    
+    subgraph Domain["DOMAIN LAYER"]
+        F[Entidades<br/>Cliente Documento Email Endereco Telefone]
+        G[Value Objects<br/>Documento Email Telefone]
+        H[Domain Events Dtos Interfaces]
+    end
+    
+    subgraph Infrastructure["INFRASTRUCTURE LAYER"]
+        I[Entity Framework Core<br/>Migrations Repositories DbContext]
+        J[PostgreSQL 12<br/>Porta 5434<br/>Data Volume Indexes]
+    end
+    
+    A -->|HTTP/REST| B
+    B --> C
+    C --> D
+    C --> E
+    D --> F
+    E --> G
+    F --> I
+    G --> I
+    I --> J
+    
+    style Presentation fill:#e1f5ff
+    style Application fill:#fff3e0
+    style Domain fill:#f3e5f5
+    style Infrastructure fill:#e8f5e9
 ```
 
-### CQRS (Command Query Responsibility Segregation)
+#### Fluxo CQRS
 
-Padrão implementado com MediatR para separar operações de leitura e escrita:
-
-```
-WRITE OPERATIONS (Commands)                    READ OPERATIONS (Queries)
-┌─────────────────────────┐                    ┌─────────────────────────┐
-│  CreateClienteCommand   │                    │  GetAllClientesQuery    │
-│  UpdateClienteCommand   │                    │  GetClienteByIdQuery    │
-│  DeleteClienteCommand   │                    │  SearchClientesQuery    │
-└───────────┬─────────────┘                    └───────────┬─────────────┘
-            │                                              │
-            ▼                                              ▼
-┌─────────────────────────┐                    ┌─────────────────────────┐
-│  Command Handlers       │                    │  Query Handlers         │
-│  - Validação            │                    │  - Filtragem            │
-│  - Regras de Negócio    │                    │  - Paginação            │
-│  - Domain Validation    │                    │  - Ordenação            │
-└───────────┬─────────────┘                    └───────────┬─────────────┘
-            │                                              │
-            ▼                                              ▼
-┌─────────────────────────┐                    ┌─────────────────────────┐
-│  Domain Entities        │                    │  DTOs                   │
-│  - Cliente              │                    │  - ClienteDto           │
-│  - Validação            │                    │  - Paginação            │
-└───────────┬─────────────┘                    └───────────┬─────────────┘
-            │                                              │
-            ▼                                              │
-┌─────────────────────────┐                                │
-│  Repositories           │                                │
-│  - IClienteRepository   │                                │
-│  - Save Changes         │                                │
-└───────────┬─────────────┘                                │
-            │                                              │
-            └──────────────────┬───────────────────────────┘
-                               ▼
-                    ┌─────────────────────────┐
-                    │   PostgreSQL Database   │
-                    │   - Write Operations    │
-                    │   - Read Operations     │
-                    └─────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Commands["WRITE OPERATIONS"]
+        direction TB
+        C1[CreateClienteCommand]
+        C2[UpdateClienteCommand]
+        C3[DeleteClienteCommand]
+    end
+    
+    subgraph Queries["READ OPERATIONS"]
+        direction TB
+        Q1[GetAllClientesQuery]
+        Q2[GetClienteByIdQuery]
+        Q3[SearchClientesQuery]
+    end
+    
+    subgraph Handlers["HANDLERS"]
+        direction TB
+        H1[Command Handlers<br/>Validação<br/>Regras de Negócio]
+        H2[Query Handlers<br/>Filtragem<br/>Paginação<br/>Ordenação]
+    end
+    
+    subgraph Domain["DOMAIN LAYER"]
+        D1[Domain Entities<br/>Cliente Validação]
+        D2[DTOs<br/>ClienteDto Paginação]
+    end
+    
+    subgraph Repository["REPOSITORY LAYER"]
+        R1[IClienteRepository<br/>Save Changes]
+    end
+    
+    subgraph Database["DATABASE"]
+        DB[PostgreSQL<br/>Write & Read Operations]
+    end
+    
+    C1 & C2 & C3 --> H1
+    Q1 & Q2 & Q3 --> H2
+    H1 --> D1
+    H2 --> D2
+    D1 --> R1
+    D2 -.-> DB
+    R1 --> DB
+    
+    style Commands fill:#ffebee
+    style Queries fill:#e8f5e9
+    style Handlers fill:#fff3e0
+    style Domain fill:#f3e5f5
+    style Repository fill:#e1f5ff
+    style Database fill:#fce4ec
 ```
 
 ---
@@ -282,177 +287,286 @@ docker-compose down -v
 ## 📁 Estrutura do Projeto
 
 ```
-TesteDevRommanel/
-├── Back/                          # Back-end .NET 8
-│   ├── Clientes.Api/             # API REST (EntryPoint)
-│   │   ├── Controllers/          # Controladores HTTP
-│   │   ├── Extensions/           # Extensões de configuração
-│   │   ├── Program.cs            # Configuração da aplicação
-│   │   └── Dockerfile            # Configuração Docker
+📦 TesteDevRommanel/
+├── 📂 Back/                          # Back-end .NET 8
+│   ├── 📂 Clientes.Api/             # API REST (EntryPoint)
+│   │   ├── 📂 Controllers/          # Controladores HTTP
+│   │   ├── 📂 Extensions/           # Extensões de configuração
+│   │   ├── 📄 Program.cs            # Configuração da aplicação
+│   │   ├── 📄 appsettings.json      # Configurações
+│   │   └── 🐳 Dockerfile            # Configuração Docker
 │   │
-│   ├── Clientes.Aplicacao/       # Camada de Aplicação (CQRS)
-│   │   ├── Commands/             # Commands (Create, Update, Delete)
-│   │   │   ├── CreateCliente/
-│   │   │   │   ├── CreateClienteCommand.cs
-│   │   │   │   ├── CreateClienteCommandHandler.cs
-│   │   │   │   └── CreateClienteCommandValidator.cs
-│   │   │   └── UpdateCliente/
-│   │   │   └── DeleteCliente/
+│   ├── 📂 Clientes.Aplicacao/       # Camada de Aplicação (CQRS)
+│   │   ├── 📂 Commands/             # Commands (Write Operations)
+│   │   │   ├── 📂 CreateCliente/
+│   │   │   │   ├── 📄 Command.cs
+│   │   │   │   ├── 📄 Handler.cs
+│   │   │   │   └── 📄 Validator.cs
+│   │   │   ├── 📂 UpdateCliente/
+│   │   │   └── 📂 DeleteCliente/
 │   │   │
-│   │   ├── Queries/              # Queries (GetAll, GetById)
-│   │   │   ├── GetAllClientes/
-│   │   │   │   ├── GetAllClientesQuery.cs
-│   │   │   │   └── GetAllClientesQueryHandler.cs
-│   │   │   └── GetClienteById/
+│   │   ├── 📂 Queries/              # Queries (Read Operations)
+│   │   │   ├── 📂 GetAllClientes/
+│   │   │   │   ├── 📄 Query.cs
+│   │   │   │   └── 📄 Handler.cs
+│   │   │   └── 📂 GetClienteById/
 │   │   │
-│   │   └── ConfigureServices.cs  # Registro de serviços
+│   │   └── 📄 ConfigureServices.cs  # Registro de serviços
 │   │
-│   ├── Clientes.Dominio/         # Camada de Domínio
-│   │   ├── Entidades/            # Entidades de domínio
-│   │   │   ├── Cliente.cs
-│   │   │   ├── Documento.cs
-│   │   │   ├── Email.cs
-│   │   │   ├── Endereco.cs
-│   │   │   └── Telefone.cs
+│   ├── 📂 Clientes.Dominio/         # Camada de Domínio
+│   │   ├── 📂 Entidades/            # Entidades de domínio
+│   │   │   ├── 📄 Cliente.cs
+│   │   │   ├── 📄 Documento.cs
+│   │   │   ├── 📄 Email.cs
+│   │   │   ├── 📄 Endereco.cs
+│   │   │   └── 📄 Telefone.cs
 │   │   │
-│   │   ├── ObjetosDeValor/       # Value Objects
-│   │   │   ├── Documento.cs
-│   │   │   ├── Email.cs
-│   │   │   ├── Telefone.cs
-│   │   │   └── TipoDocumento.cs
+│   │   ├── 📂 ObjetosDeValor/       # Value Objects
+│   │   │   ├── 📄 Documento.cs
+│   │   │   ├── 📄 Email.cs
+│   │   │   ├── 📄 Telefone.cs
+│   │   │   └── 📄 TipoDocumento.cs
 │   │   │
-│   │   ├── Dtos/                 # Data Transfer Objects
-│   │   │   └── ClienteDto.cs
+│   │   ├── 📂 Dtos/                 # Data Transfer Objects
+│   │   │   └── 📄 ClienteDto.cs
 │   │   │
-│   │   ├── Eventos/              # Domain Events
-│   │   └── Interfaces/           # Interfaces de repositórios
-│   │       └── IClienteRepository.cs
+│   │   ├── 📂 Eventos/              # Domain Events
+│   │   └── 📂 Interfaces/           # Interfaces de repositórios
+│   │       └── 📄 IClienteRepository.cs
 │   │
-│   └── Clientes.Infra/           # Camada de Infraestrutura
-│       ├── Contexto/             # DbContext EF Core
-│       │   └── ClienteContext.cs
+│   └── 📂 Clientes.Infra/           # Camada de Infraestrutura
+│       ├── 📂 Contexto/             # DbContext EF Core
+│       │   └── 📄 ClienteContext.cs
 │       │
-│       ├── Repositorio/          # Implementação de repositórios
-│       │   └── ClienteRepository.cs
+│       ├── 📂 Repositorio/          # Implementação de repositórios
+│       │   └── 📄 ClienteRepository.cs
 │       │
-│       └── Scripts/              # Scripts de banco de dados
-│           ├── migrations.sql    # Criação das tabelas
-│           └── insert.sql        # Dados iniciais
+│       └── 📂 Scripts/              # Scripts de banco de dados
+│           ├── 📄 migrations.sql    # Criação das tabelas
+│           └── 📄 insert.sql        # Dados iniciais
 │
-├── Front/                         # Front-end Angular
-│   └── cliente-app/
-│       ├── src/
-│       │   ├── app/
-│       │   │   ├── components/   # Componentes Angular
-│       │   │   │   ├── lista/           # Lista de clientes
-│       │   │   │   ├── novo/            # Formulário de cadastro
-│       │   │   │   ├── editar/          # Formulário de edição
-│       │   │   │   ├── excluir/         # Modal de exclusão
-│       │   │   │   └── detalhes/        # Detalhes do cliente
+├── 📂 Front/                         # Front-end Angular
+│   └── 📂 cliente-app/
+│       ├── 📂 src/
+│       │   ├── 📂 app/
+│       │   │   ├── 📂 components/   # Componentes Angular
+│       │   │   │   ├── 📂 lista/           # Lista de clientes
+│       │   │   │   ├── 📂 novo/            # Formulário de cadastro
+│       │   │   │   ├── 📂 editar/          # Formulário de edição
+│       │   │   │   ├── 📂 excluir/         # Modal de exclusão
+│       │   │   │   └── 📂 detalhes/        # Detalhes do cliente
 │       │   │   │
-│       │   │   ├── services/   # Serviços HTTP
-│       │   │   │   └── cliente.service.ts
+│       │   │   ├── 📂 services/   # Serviços HTTP
+│       │   │   │   └── 📄 cliente.service.ts
 │       │   │   │
-│       │   │   └── models/     # Modelos TypeScript
-│       │   │       └── cliente.model.ts
+│       │   │   └── 📂 models/     # Modelos TypeScript
+│       │   │       └── 📄 cliente.model.ts
 │       │   │
-│       │   └── assets/         # Imagens e recursos estáticos
+│       │   └── 📂 assets/         # Imagens e recursos estáticos
 │       │
-│       ├── angular.json        # Configuração do Angular
-│       ├── package.json        # Dependências Node.js
-│       └── Dockerfile          # Configuração Docker
+│       ├── 📄 angular.json        # Configuração do Angular
+│       ├── 📄 package.json        # Dependências Node.js
+│       ├── 📄 tsconfig.json       # Configuração TypeScript
+│       └── 🐳 Dockerfile          # Configuração Docker
 │
-├── Scripts/                     # Scripts de inicialização
-│   ├── migrations.sql          # Criação do banco de dados
-│   └── insert.sql              # Dados iniciais
+├── 📂 Scripts/                     # Scripts de inicialização
+│   ├── 📄 migrations.sql          # Criação do banco de dados
+│   └── 📄 insert.sql              # Dados iniciais
 │
-├── data2/                       # Volume do PostgreSQL
-│   └── (dados do banco)
+├── 📂 data2/                       # Volume do PostgreSQL
+│   └── 🗄️ (dados do banco)
 │
-├── docker-compose.yml           # Orquestração Docker
-└── README.md                    # Documentação
+├── 🐳 docker-compose.yml           # Orquestração Docker
+├── 📄 README.md                    # Documentação
+└── 📄 .gitignore                   # Ignorar arquivos
+```
+
+### 📊 Visão Geral da Estrutura
+
+```mermaid
+graph TB
+    Root[📦 TesteDevRommanel/]
+    
+    subgraph Back["Back-end .NET 8"]
+        B1[Clientes.Api<br/>API REST]
+        B2[Clientes.Aplicacao<br/>CQRS]
+        B3[Clientes.Dominio<br/>Entidades]
+        B4[Clientes.Infra<br/>EF Core]
+    end
+    
+    subgraph Front["Front-end Angular"]
+        F1[cliente-app<br/>Components]
+        F2[Services<br/>HTTP]
+        F3[Models<br/>TypeScript]
+    end
+    
+    subgraph Scripts["Scripts DB"]
+        S1[migrations.sql]
+        S2[insert.sql]
+    end
+    
+    Root --> Back
+    Root --> Front
+    Root --> Scripts
+    Root --> DC[🐳 docker-compose.yml]
+    
+    style Back fill:#e1f5ff
+    style Front fill:#fff3e0
+    style Scripts fill:#f3e5f5
+    style DC fill:#e8f5e9
 ```
 
 ---
 
 ## 📊 Regras de Negócio
 
-### 1. Validação de Documentos
+### 1️⃣ Validação de Documentos
 
-| Tipo | Regra |
-|------|-------|
-| **CPF** | - Formato: 000.000.000-00<br>- Validação de dígitos verificadores<br>- Apenas um cadastro por CPF |
-| **CNPJ** | - Formato: 00.000.000/0000-00<br>- Validação de dígitos verificadores<br>- Apenas um cadastro por CNPJ |
+| Tipo | Formato | Validação | Restrição |
+|------|---------|-----------|-----------|
+| **CPF** | `000.000.000-00` | Dígitos verificadores | Único no sistema |
+| **CNPJ** | `00.000.000/0000-00` | Dígitos verificadores | Único no sistema |
 
-### 2. Validação por Tipo de Pessoa
+### 2️⃣ Validação por Tipo de Pessoa
 
-#### Pessoa Física (CPF)
-- ✅ Idade mínima de **18 anos**
-- ✅ Campos obrigatórios: Nome, CPF, Telefone, E-mail, Endereço
-- ✅ Opcional: Inscrição Estadual, Isento
+#### 👤 Pessoa Física (CPF)
 
-#### Pessoa Jurídica (CNPJ)
-- ✅ Campos obrigatórios: Razão Social, CNPJ, Telefone, E-mail, Endereço
-- ✅ **Inscrição Estadual OU Isento** (um dos dois obrigatórios)
+```
+✅ Idade mínima: 18 anos
+✅ Campos obrigatórios:
+   - Nome completo
+   - CPF válido
+   - Telefone
+   - E-mail único
+   - Endereço completo (CEP, Logradouro, Número, Bairro, Cidade, Estado)
+❌ Campos opcionais:
+   - Inscrição Estadual
+   - Isento
+```
 
-### 3. Validação de Unicidade
+#### 🏢 Pessoa Jurídica (CNPJ)
 
-- ✅ **E-mail único** para cada cliente (não pode repetir)
-- ✅ **Documento único** (CPF/CNPJ não pode repetir)
+```
+✅ Campos obrigatórios:
+   - Razão Social
+   - CNPJ válido
+   - Telefone
+   - E-mail único
+   - Endereço completo
+✅ Obrigatório UM dos dois:
+   - Inscrição Estadual OU
+   - Isento de Inscrição Estadual
+```
 
-### 4. Validação de Campos Obrigatórios
+### 3️⃣ Validação de Unicidade
 
-| Campo | Pessoa Física | Pessoa Jurídica |
-|-------|---------------|-----------------|
-| Nome / Razão Social | ✅ Obrigatório | ✅ Obrigatório |
-| Documento (CPF/CNPJ) | ✅ Obrigatório | ✅ Obrigatório |
-| Telefone | ✅ Obrigatório | ✅ Obrigatório |
-| E-mail | ✅ Obrigatório | ✅ Obrigatório |
-| Endereço (CEP, Logradouro, Número, Bairro, Cidade, Estado) | ✅ Obrigatório | ✅ Obrigatório |
-| Inscrição Estadual | ❌ Opcional | ✅ OU Isento |
-| Isento | ❌ Opcional | ✅ OU Inscrição Estadual |
+| Campo | Regra | Mensagem de Erro |
+|-------|-------|------------------|
+| 📧 **E-mail** | Não pode repetir | "E-mail já cadastrado!" |
+| 📄 **Documento** | Não pode repetir | "Documento já cadastrado!" |
 
-### 5. Regras de Negócio Adicionais
+### 4️⃣ Campos Obrigatórios
 
-- ✅ Cliente não pode ser excluído fisicamente (soft delete com flag `Removido`)
-- ✅ Dados históricos mantidos para auditoria
-- ✅ Validação de formato de e-mail (regex)
-- ✅ Validação de formato de telefone
+| Campo | Pessoa Física | Pessoa Jurídica | Validação |
+|-------|---------------|-----------------|-----------|
+| Nome / Razão Social | ✅ | ✅ | Não vazio, máx 100 chars |
+| Documento (CPF/CNPJ) | ✅ | ✅ | Formato + Dígitos verificadores |
+| Telefone | ✅ | ✅ | Formato (XX) XXXXX-XXXX |
+| E-mail | ✅ | ✅ | Formato válido + Único |
+| CEP | ✅ | ✅ | Formato 00000-000 |
+| Logradouro | ✅ | ✅ | Não vazio |
+| Número | ✅ | ✅ | Não vazio |
+| Bairro | ✅ | ✅ | Não vazio |
+| Cidade | ✅ | ✅ | Não vazio |
+| Estado | ✅ | ✅ | 2 caracteres |
+| Inscrição Estadual | ❌ | ✅ OU Isento | - |
+| Isento | ❌ | ✅ OU IE | Boolean |
+
+### 5️⃣ Regras de Negócio Adicionais
+
+| Regra | Descrição | Implementação |
+|-------|-----------|---------------|
+| 🔒 **Soft Delete** | Cliente não é excluído fisicamente | Flag `Removido = true` |
+| 📜 **Auditoria** | Dados históricos mantidos | Consultas filtram `Removido = false` |
+| ✉️ **E-mail** | Validação de formato | Regex pattern |
+| 📞 **Telefone** | Validação de formato | Máscara (XX) XXXXX-XXXX |
+| 🎂 **Idade** | Pessoa física ≥ 18 anos | Cálculo baseado em DataNascimento |
+| ⚖️ **IE/Isento** | PJ precisa de um dos dois | Validação cruzada |
+
+### 6️⃣ Fluxo de Validação
+
+```mermaid
+flowchart TD
+    A[📝 NOVO CLIENTE] --> B{1. Tipo de Documento?}
+    B -->|CPF| C[2. Validar CPF<br/>9 dígitos + 2 verificadores]
+    B -->|CNPJ| D[2. Validar CNPJ<br/>14 dígitos + 2 verificadores]
+    
+    C --> E{3. Documento Único?}
+    D --> E
+    E -->|Sim| F{4. E-mail Único?}
+    E -->|Não| G[❌ Erro: Documento já cadastrado]
+    
+    F -->|Sim| H{5. Idade ≥ 18 anos?<br/>(se CPF)}
+    F -->|Não| I[❌ Erro: E-mail já cadastrado]
+    
+    H -->|Sim| J{6. Campos Obrigatórios?}
+    H -->|Não| K[❌ Erro: Menor de 18 anos]
+    
+    J -->|Sim| L{7. PJ precisa IE ou Isento?}
+    J -->|Não| M[❌ Erro: Campos obrigatórios]
+    
+    L -->|Sim| N[✅ Cliente Cadastrado]
+    L -->|Não| O[❌ Erro: IE ou Isento obrigatório]
+    
+    style A fill:#e3f2fd
+    style N fill:#c8e6c9
+    style G fill:#ffcdd2
+    style I fill:#ffcdd2
+    style K fill:#ffcdd2
+    style M fill:#ffcdd2
+    style O fill:#ffcdd2
+```
 
 ---
 
 ## 🔌 API Endpoints
 
-### Clientes
+### 📋 Endpoints Disponíveis
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `GET` | `/api/clientes` | Listar todos os clientes (com paginação) |
-| `GET` | `/api/clientes/:id` | Buscar cliente por ID |
-| `GET` | `/api/clientes/by-nome/:nome` | Buscar clientes por nome |
-| `GET` | `/api/clientes/by-documento/:documento` | Buscar cliente por documento |
-| `GET` | `/api/clientes/by-email/:email` | Buscar cliente por e-mail |
-| `POST` | `/api/clientes` | Criar novo cliente |
-| `PUT` | `/api/clientes/:id` | Atualizar cliente existente |
-| `DELETE` | `/api/clientes/:id` | Excluir cliente (soft delete) |
+| Método | Endpoint | Descrição | Autenticação |
+|--------|----------|-----------|--------------|
+| **GET** | `/api/clientes` | Listar clientes (paginado) | ❌ |
+| **GET** | `/api/clientes/{id}` | Buscar cliente por ID | ❌ |
+| **GET** | `/api/clientes/by-nome/{nome}` | Buscar por nome | ❌ |
+| **GET** | `/api/clientes/by-documento/{documento}` | Buscar por CPF/CNPJ | ❌ |
+| **GET** | `/api/clientes/by-email/{email}` | Buscar por e-mail | ❌ |
+| **POST** | `/api/clientes` | Criar novo cliente | ❌ |
+| **PUT** | `/api/clientes/{id}` | Atualizar cliente | ❌ |
+| **DELETE** | `/api/clientes/{id}` | Excluir cliente (soft) | ❌ |
 
-### Parâmetros de Consulta
+### 🔍 Consulta com Paginação
 
 ```
 GET /api/clientes?pageNumber=1&pageSize=10&filter=maria&order=nome
 ```
 
-| Parâmetro | Tipo | Obrigatório | Descrição |
-|-----------|------|-------------|-----------|
-| `pageNumber` | int | ❌ | Número da página (padrão: 1) |
-| `pageSize` | int | ❌ | Quantidade de registros por página (padrão: 10, máximo: 100) |
-| `filter` | string | ❌ | Termo de busca por nome |
-| `order` | string | ❌ | Campo para ordenação |
+| Parâmetro | Tipo | Obrigatório | Padrão | Máximo | Descrição |
+|-----------|------|-------------|--------|--------|-----------|
+| `pageNumber` | int | ❌ | 1 | - | Número da página |
+| `pageSize` | int | ❌ | 10 | 100 | Registros por página |
+| `filter` | string | ❌ | - | - | Termo de busca (nome) |
+| `order` | string | ❌ | - | - | Campo para ordenação |
+| `orderDirection` | string | ❌ | asc | asc/desc | Direção da ordenação |
 
-### Exemplos de Resposta
+### 💡 Exemplos de Uso
 
-#### Listar Clientes (Sucesso)
+#### 1️⃣ Listar Todos os Clientes
 
+```bash
+curl http://localhost:8090/api/clientes
+```
+
+**Resposta:**
 ```json
 {
   "data": [
@@ -483,8 +597,49 @@ GET /api/clientes?pageNumber=1&pageSize=10&filter=maria&order=nome
 }
 ```
 
-#### Criar Cliente (Sucesso)
+#### 2️⃣ Listar com Paginação
 
+```bash
+curl "http://localhost:8090/api/clientes?pageNumber=2&pageSize=5"
+```
+
+#### 3️⃣ Buscar com Filtro
+
+```bash
+curl "http://localhost:8090/api/clientes?filter=maria"
+```
+
+#### 4️⃣ Buscar com Ordenação
+
+```bash
+curl "http://localhost:8090/api/clientes?order=nome&orderDirection=desc"
+```
+
+#### 5️⃣ Criar Cliente (Pessoa Física)
+
+```bash
+curl -X POST http://localhost:8090/api/clientes \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "João Souza",
+    "documento": "11122233344",
+    "dataNascimento": "1990-05-20",
+    "telefone": "(11) 99999-8888",
+    "email": "joao.souza@email.com",
+    "inscricaoEstadual": "",
+    "isento": true,
+    "endereco": {
+      "cep": "01002-000",
+      "logradouro": "Avenida Paulista",
+      "numero": "1000",
+      "bairro": "Bela Vista",
+      "cidade": "São Paulo",
+      "estado": "SP"
+    }
+  }'
+```
+
+**Resposta de Sucesso:**
 ```json
 {
   "success": true,
@@ -495,8 +650,9 @@ GET /api/clientes?pageNumber=1&pageSize=10&filter=maria&order=nome
 }
 ```
 
-#### Criar Cliente (Erro de Validação)
+#### 6️⃣ Criar Cliente (Erro de Validação)
 
+**Resposta de Erro:**
 ```json
 {
   "success": false,
@@ -512,6 +668,73 @@ GET /api/clientes?pageNumber=1&pageSize=10&filter=maria&order=nome
   ]
 }
 ```
+
+#### 7️⃣ Atualizar Cliente
+
+```bash
+curl -X PUT http://localhost:8090/api/clientes/c1d2e3f4-a5b6-7890-c1d2-e3f4a5b67890 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Maria Silva Souza",
+    "documento": "123.456.789-00",
+    "dataNascimento": "1985-06-15",
+    "telefone": "(11) 98765-4321",
+    "email": "maria.souza@email.com",
+    "inscricaoEstadual": "",
+    "isento": true,
+    "endereco": {
+      "cep": "01001-000",
+      "logradouro": "Praça da Sé",
+      "numero": "456",
+      "bairro": "Sé",
+      "cidade": "São Paulo",
+      "estado": "SP"
+    }
+  }'
+```
+
+#### 8️⃣ Excluir Cliente (Soft Delete)
+
+```bash
+curl -X DELETE http://localhost:8090/api/clientes/c1d2e3f4-a5b6-7890-c1d2-e3f4a5b67890
+```
+
+**Resposta:**
+```json
+{
+  "success": true,
+  "message": "Cliente removido com sucesso!"
+}
+```
+
+### 📊 Estrutura do Cliente
+
+```typescript
+interface Cliente {
+  id: string;                    // UUID
+  nome: string;                  // Nome ou Razão Social
+  documento: string;             // CPF/CNPJ formatado
+  tipoDocumento: number;         // 1 = CPF, 2 = CNPJ
+  dataNascimento: Date;          // Data de nascimento (PJ tem data de criação)
+  telefone: string;              // (XX) XXXXX-XXXX
+  email: string;                 // e-mail único
+  cep: string;                   // 00000-000
+  logradouro: string;            // Rua, Av, etc
+  numero: string;                // Número do endereço
+  bairro: string;                // Bairro
+  cidade: string;                // Cidade
+  estado: string;                // UF (2 caracteres)
+  inscricaoEstadual: string;     // IE (opcional PF, obrigatório OU isento PJ)
+  isento: boolean;               // Isento de IE
+}
+```
+
+### 🔑 Tipos de Documento
+
+| Valor | Tipo | Descrição |
+|-------|------|-----------|
+| `1` | CPF | Pessoa Física |
+| `2` | CNPJ | Pessoa Jurídica |
 
 ---
 
